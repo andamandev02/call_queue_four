@@ -166,71 +166,73 @@ class _MainScreenState extends State<MainScreen> {
             }
           }
 
-          await _playAudioFile(
-              p.join(usbPath, 'SOUNDTRACK', 'เชิญหมายเลข.mp3'));
-          await audioPlayer.onPlayerStateChanged.firstWhere(
-            (state) => state == PlayerState.completed,
-          );
-          for (int i = 0; i < numberString.length; i++) {
+          if (index >= 0 && index < _messages.length) {
             await _playAudioFile(
-                p.join(usbPath, 'SOUNDTRACK', '${numberString[i]}.mp3'));
-            if (i + 1 < numberString.length &&
-                numberString[i] == numberString[i + 1]) {
-              await audioPlayer.onPlayerStateChanged.firstWhere(
-                (state) => state == PlayerState.completed,
-              );
-            } else {
-              await Future.delayed(const Duration(milliseconds: 650));
+                p.join(usbPath, 'SOUNDTRACK', 'เชิญหมายเลข.mp3'));
+            await audioPlayer.onPlayerStateChanged.firstWhere(
+              (state) => state == PlayerState.completed,
+            );
+            for (int i = 0; i < numberString.length; i++) {
+              await _playAudioFile(
+                  p.join(usbPath, 'SOUNDTRACK', '${numberString[i]}.mp3'));
+              if (i + 1 < numberString.length &&
+                  numberString[i] == numberString[i + 1]) {
+                await audioPlayer.onPlayerStateChanged.firstWhere(
+                  (state) => state == PlayerState.completed,
+                );
+              } else {
+                await Future.delayed(const Duration(milliseconds: 650));
+              }
             }
+            await _playAudioFile(
+                p.join(usbPath, 'SOUNDTRACK', 'ที่เค้าเตอร์หมายเลข.mp3'));
+
+            await audioPlayer.onPlayerStateChanged.firstWhere(
+              (state) => state == PlayerState.completed,
+            );
+
+            await _playAudioFile(
+                p.join(usbPath, 'SOUNDTRACK', '${index + 1}.mp3'));
+          } else {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                const duration = Duration(seconds: 5);
+                Timer(duration, () {
+                  Navigator.of(context).pop();
+                });
+                return const AlertDialog(
+                  title: Text(
+                    'กรุณาระบุ ไฟล์ USB ที่ต้องการใช้งาน',
+                    style: const TextStyle(fontSize: 20),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              },
+            );
+            //   await audioPlayer.play(AssetSource('soundtrack/เชิญหมายเลข.mp3'));
+            //   await audioPlayer.onPlayerStateChanged.firstWhere(
+            //     (state) => state == PlayerState.completed,
+            //   );
+            //   for (int i = 0; i < numberString.length; i++) {
+            //     await audioPlayer
+            //         .play(AssetSource('soundtrack/${numberString[i]}.mp3'));
+            //     if (i + 1 < numberString.length &&
+            //         numberString[i] == numberString[i + 1]) {
+            //       await audioPlayer.onPlayerStateChanged.firstWhere(
+            //         (state) => state == PlayerState.completed,
+            //       );
+            //     } else {
+            //       await Future.delayed(const Duration(milliseconds: 650));
+            //     }
+            //   }
+            //   await audioPlayer
+            //       .play(AssetSource('soundtrack/ที่เค้าเตอร์หมายเลข.mp3'));
+            //   await audioPlayer.onPlayerStateChanged.firstWhere(
+            //     (state) => state == PlayerState.completed,
+            //   );
+            //   await audioPlayer.play(AssetSource('soundtrack/${index}.mp3'));
           }
-          await _playAudioFile(
-              p.join(usbPath, 'SOUNDTRACK', 'ที่เค้าเตอร์หมายเลข.mp3'));
-
-          await audioPlayer.onPlayerStateChanged.firstWhere(
-            (state) => state == PlayerState.completed,
-          );
-
-          await _playAudioFile(
-              p.join(usbPath, 'SOUNDTRACK', '${index + 1}.mp3'));
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              const duration = Duration(seconds: 5);
-              Timer(duration, () {
-                Navigator.of(context).pop();
-              });
-              return const AlertDialog(
-                title: Text(
-                  'กรุณาระบุ ไฟล์ USB ที่ต้องการใช้งาน',
-                  style: const TextStyle(fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
-              );
-            },
-          );
-          //   await audioPlayer.play(AssetSource('soundtrack/เชิญหมายเลข.mp3'));
-          //   await audioPlayer.onPlayerStateChanged.firstWhere(
-          //     (state) => state == PlayerState.completed,
-          //   );
-          //   for (int i = 0; i < numberString.length; i++) {
-          //     await audioPlayer
-          //         .play(AssetSource('soundtrack/${numberString[i]}.mp3'));
-          //     if (i + 1 < numberString.length &&
-          //         numberString[i] == numberString[i + 1]) {
-          //       await audioPlayer.onPlayerStateChanged.firstWhere(
-          //         (state) => state == PlayerState.completed,
-          //       );
-          //     } else {
-          //       await Future.delayed(const Duration(milliseconds: 650));
-          //     }
-          //   }
-          //   await audioPlayer
-          //       .play(AssetSource('soundtrack/ที่เค้าเตอร์หมายเลข.mp3'));
-          //   await audioPlayer.onPlayerStateChanged.firstWhere(
-          //     (state) => state == PlayerState.completed,
-          //   );
-          //   await audioPlayer.play(AssetSource('soundtrack/${index}.mp3'));
         }
         _timer?.cancel();
         _handleInvalidCharacter();
@@ -376,7 +378,7 @@ class _MainScreenState extends State<MainScreen> {
               left: 0,
               right: 0,
               child: Opacity(
-                opacity: 1.0, // ทำให้โปร่งใส
+                opacity: 0.0, // ทำให้โปร่งใส
                 child: TextField(
                   controller: _controller,
                   focusNode: focusNode,
