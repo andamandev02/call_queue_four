@@ -301,7 +301,7 @@ class _MainScreenState extends State<MainScreen> {
                             Positioned(
                               left:
                                   100, // Aligning "Order Number" text to the left
-                              top: gridItemHeight * 0.35,
+                              top: gridItemHeight * 0.25,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 8),
@@ -339,7 +339,7 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                             // ส่วนรูปภาพ
                             Positioned(
-                              top: 0,
+                              top: 5,
                               child: Container(
                                 height: gridItemHeight * 0.2,
                                 decoration: BoxDecoration(
@@ -358,7 +358,7 @@ class _MainScreenState extends State<MainScreen> {
                                       : Icon(
                                           Icons.image,
                                           color: Colors.white,
-                                          size: gridItemHeight * 0.3,
+                                          size: gridItemHeight * 0.5,
                                         ),
                                 ),
                               ),
