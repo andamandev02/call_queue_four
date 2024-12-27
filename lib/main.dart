@@ -125,11 +125,11 @@ class _MainScreenState extends State<MainScreen> {
 
         // ตัดส่วนเกินของ part[0] และ part[1]
         final part0 = parts[0].trim().length > 1
-            ? parts[0].trim().substring(0, 1)
-            : parts[0].trim();
+            ? parts[0].trim().replaceAll(RegExp(r'\D'), '').substring(0, 1)
+            : parts[0].trim().replaceAll(RegExp(r'\D'), '');
         final part1 = parts[1].trim().length > 3
-            ? parts[1].trim().substring(0, 3)
-            : parts[1].trim();
+            ? parts[1].trim().replaceAll(RegExp(r'\D'), '').substring(0, 3)
+            : parts[1].trim().replaceAll(RegExp(r'\D'), '');
 
         final index = int.parse(part0.trim()) - 1;
 
@@ -141,7 +141,7 @@ class _MainScreenState extends State<MainScreen> {
 
         _timer?.cancel();
         // final trimmedString = parts[1].trim().toString();
-        final numberString = part1..replaceAll(RegExp('^0+'), '');
+        final numberString = part1.replaceAll(RegExp('^0+'), '');
 
         if (await usbDir.exists()) {
           Future<void> _playAudioFile(String path) async {
@@ -194,45 +194,26 @@ class _MainScreenState extends State<MainScreen> {
             await _playAudioFile(
                 p.join(usbPath, 'SOUNDTRACK', '${index + 1}.mp3'));
           } else {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                const duration = Duration(seconds: 5);
-                Timer(duration, () {
-                  Navigator.of(context).pop();
-                });
-                return const AlertDialog(
-                  title: Text(
-                    'กรุณาระบุ ไฟล์ USB ที่ต้องการใช้งาน',
-                    style: const TextStyle(fontSize: 20),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              },
-            );
-            //   await audioPlayer.play(AssetSource('soundtrack/เชิญหมายเลข.mp3'));
-            //   await audioPlayer.onPlayerStateChanged.firstWhere(
-            //     (state) => state == PlayerState.completed,
-            //   );
-            //   for (int i = 0; i < numberString.length; i++) {
-            //     await audioPlayer
-            //         .play(AssetSource('soundtrack/${numberString[i]}.mp3'));
-            //     if (i + 1 < numberString.length &&
-            //         numberString[i] == numberString[i + 1]) {
-            //       await audioPlayer.onPlayerStateChanged.firstWhere(
-            //         (state) => state == PlayerState.completed,
-            //       );
-            //     } else {
-            //       await Future.delayed(const Duration(milliseconds: 650));
-            //     }
-            //   }
-            //   await audioPlayer
-            //       .play(AssetSource('soundtrack/ที่เค้าเตอร์หมายเลข.mp3'));
-            //   await audioPlayer.onPlayerStateChanged.firstWhere(
-            //     (state) => state == PlayerState.completed,
-            //   );
-            //   await audioPlayer.play(AssetSource('soundtrack/${index}.mp3'));
+            _timer?.cancel();
+            _handleInvalidCharacter();
           }
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              const duration = Duration(seconds: 5);
+              Timer(duration, () {
+                Navigator.of(context).pop();
+              });
+              return const AlertDialog(
+                title: Text(
+                  'กรุณาระบุ ไฟล์ USB ที่ต้องการใช้งาน',
+                  style: const TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            },
+          );
         }
         _timer?.cancel();
         _handleInvalidCharacter();
@@ -269,7 +250,6 @@ class _MainScreenState extends State<MainScreen> {
         },
         child: Stack(
           children: [
-            // GridView ที่ทับ TextField
             Positioned.fill(
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -299,9 +279,25 @@ class _MainScreenState extends State<MainScreen> {
                           children: [
                             // ส่วนข้อความ Stack
                             Positioned(
-                              left:
-                                  100, // Aligning "Order Number" text to the left
-                              top: gridItemHeight * 0.25,
+                              left: gridItemHeight * 0.1,
+                              top: gridItemHeight * 0.0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 8),
+                                child: Text(
+                                  (index + 1).toString(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: gridItemHeight * 0.20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: gridItemHeight * 0.2,
+                              top: gridItemHeight * 0.5,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 8),
@@ -318,7 +314,7 @@ class _MainScreenState extends State<MainScreen> {
                                   "Order Number",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: gridItemHeight * 0.06,
+                                    fontSize: gridItemHeight * 0.05,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
@@ -326,39 +322,53 @@ class _MainScreenState extends State<MainScreen> {
                               ),
                             ),
                             Positioned(
-                              top: gridItemHeight * 0.4,
+                              top: gridItemHeight * 0.5,
                               child: Text(
                                 _messages[index],
                                 style: TextStyle(
                                   color: const Color.fromARGB(255, 255, 217, 0),
-                                  fontSize: gridItemHeight * 0.5,
+                                  fontSize: gridItemHeight * 0.45,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
                             // ส่วนรูปภาพ
+
                             Positioned(
-                              top: 5,
+                              top: gridItemHeight * 0.002,
                               child: Container(
-                                height: gridItemHeight * 0.2,
-                                decoration: BoxDecoration(
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                                height: gridItemHeight * 0.5, // ขยายขอบเขต
+                                width: gridItemHeight * 1.0, // ขยายขอบเขต
+                                // decoration: BoxDecoration(
+                                //   color: Colors.black, // สีพื้นหลัง
+                                //   border: Border.all(
+                                //     color: Colors.white, // สีของขอบ
+                                //     width: 2.0, // ความหนาของขอบ
+                                //   ),
+                                //   borderRadius: BorderRadius.circular(
+                                //       8), // มุมโค้งของ container
+                                // ),
                                 child: Center(
                                   child: logoList.length > index &&
                                           logoList[index] != null
-                                      ? Image.file(
-                                          logoList[index],
-                                          fit: BoxFit.contain,
-                                          width: gridItemHeight * 0.3,
-                                          height: gridItemHeight * 0.3,
+                                      ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                              20), // ทำให้รูปภาพโค้งตาม container
+                                          child: Image.file(
+                                            logoList[index],
+                                            fit: BoxFit
+                                                .contain, // ให้รูปภาพอยู่ในขอบเขต
+                                            width: gridItemHeight *
+                                                2.0, // ขนาดของรูปภาพ
+                                            height: gridItemHeight * 0.45,
+                                          ),
                                         )
                                       : Icon(
                                           Icons.image,
                                           color: Colors.white,
-                                          size: gridItemHeight * 0.5,
+                                          size: gridItemHeight *
+                                              0.4, // ขนาดของไอคอน
                                         ),
                                 ),
                               ),
